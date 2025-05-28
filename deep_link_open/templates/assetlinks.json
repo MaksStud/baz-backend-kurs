@@ -1,0 +1,11 @@
+[
+  {
+    "relation": ["delegate_permission/common.handle_all_urls"],
+    "target": {
+      "namespace": "android_app",
+      "package_name": "com.ivanfranco.BAZHAYRN",
+      "sha256_cert_fingerprints":
+        ["71:20:6E:3D:90:9C:C6:DD:78:13:B9:F1:5A:1C:53:2B:29:4B:CB:41:72:AD:AC:7D:3C:87:97:AC:E2:F7:8C:01"]
+    }
+  }
+]

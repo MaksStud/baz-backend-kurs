@@ -1,0 +1,118 @@
+{% extends "admin/base_site.html" %}
+
+{% block content %}
+<div>
+    <h1>{{ theme }}</h1>
+    <div id="chat-container" style="border: 1px solid #ccc; padding: 10px; max-width: 800px; max-height: 400px; overflow-y: auto;">
+        <!-- Messages will be loaded here -->
+    </div>
+    <form id="message-form" method="post" style="margin-top: 20px;">
+        {% csrf_token %}
+        <textarea name="message_text" id="message-text" rows="3" style="width: 100%;" placeholder="Enter a message..."></textarea>
+        <button type="submit" style="
+            margin-top: 10px;
+            background: var(--button-bg);
+            padding: 10px 15px;
+            border: none;
+            border-radius: 4px;
+            color: var(--button-fg);
+            cursor: pointer;
+            transition: background 0.15s;
+        ">
+            Send
+        </button>
+    </form>
+</div>
+
+<script>
+    const chatId = "{{ chat.id }}";
+    const chatContainer = document.getElementById("chat-container");
+    const messageForm = document.getElementById("message-form");
+    const messageText = document.getElementById("message-text");
+
+    let socket;
+
+    function loadMessages() {
+        fetch(`/api/support/chat_in_admin/${chatId}/?messages=true`, {
+            headers: {
+                "X-Requested-With": "XMLHttpRequest"
+            }
+        })
+        .then(response => response.json())
+        .then(data => {
+            updateChatContainer(data);
+            connectWebSocket();
+        })
+        .catch(error => console.error("Error loading messages:", error));
+    }
+
+    function updateChatContainer(messages) {
+        messages.forEach(message => {
+            const messageDiv = document.createElement("div");
+            messageDiv.style.textAlign = message.from_user ? "left" : "right";
+            messageDiv.style.margin = "10px 0";
+
+            const messageContent = document.createElement("div");
+            messageContent.style.display = "inline-block";
+            messageContent.style.backgroundColor = message.from_user ? "#f0f0f0" : "#264b5d";
+            messageContent.style.color = message.from_user ? "#000" : "#fff";
+            messageContent.style.padding = "10px";
+            messageContent.style.borderRadius = "8px";
+
+            messageContent.innerHTML = `
+                <small>${message.created_at}</small>
+                <p>${message.message_text}</p>
+                ${message.file ? `<p><a href="${message.file}" target="_blank">Attached file</a></p>` : ""}
+            `;
+
+            messageDiv.appendChild(messageContent);
+            chatContainer.appendChild(messageDiv);
+        });
+
+        chatContainer.scrollTop = chatContainer.scrollHeight;
+    }
+
+    function sendMessage(event) {
+        event.preventDefault();
+        const message = messageText.value.trim();
+
+        if (!message) return;
+
+        const data = {
+            message_text: message
+        };
+
+        socket.send(JSON.stringify(data));
+        messageText.value = "";
+    }
+
+    function connectWebSocket() {
+        const socketUrl = `wss://{{ server_url }}/ws/chat/${chatId}/`;
+        socket = new WebSocket(socketUrl);
+
+        socket.onopen = () => {
+            console.log("WebSocket connect");
+        };
+
+        socket.onmessage = (event) => {
+            const data = JSON.parse(event.data);
+            updateChatContainer([data]);
+        };
+
+        socket.onclose = () => {
+            console.log("WebSocket close");
+        };
+
+        socket.onerror = (error) => {
+            console.error("WebSocket error:", error);
+        };
+    }
+
+    window.addEventListener("load", () => {
+        loadMessages();
+    });
+
+    messageForm.addEventListener("submit", sendMessage);
+</script>
+
+{% endblock %}

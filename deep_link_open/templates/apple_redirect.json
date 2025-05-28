@@ -1,0 +1,17 @@
+{
+  "applinks": {
+    "apps": [],
+    "details": [
+      {
+        "appID": "XN7F98S5XU.com.ivanfranco.BAZHAYRN",
+        "paths": ["/deep_link_open/redirect/*"]
+      }
+    ]
+  },
+  "activitycontinuation": {
+    "apps": ["XN7F98S5XU.com.ivanfranco.BAZHAYRN"]
+  },
+  "webcredentials": {
+    "apps": ["XN7F98S5XU.com.ivanfranco.BAZHAYRN"]
+  }
+}

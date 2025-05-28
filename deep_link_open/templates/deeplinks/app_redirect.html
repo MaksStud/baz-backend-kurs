@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Bazhay!</title>
+  <link rel="icon" type="image/png" href="https://bazhay.com/media/media/logo.png">
+  <meta property="og:title" content="Bazhay!" />
+  <meta property="og:description" content="Додаток для створення вішлістів ✨" />
+  <meta property="og:image" content="https://bazhay.com/media/media/logo.png" />
+  <meta property="og:url" content="https://bazhay.com/deep_link_open/redirect/{{ path }}" />
+  <meta property="og:type" content="website" />
+</head>
+<body>
+  <p>Redirecting to the app...</p>
+
+  <script>
+    const path = "{{ path }}";
+    const appStoreLink = "{{ app_store_link }}";
+    const playStoreLink = "{{ play_store_link }}";
+    const deepLink = `bazhay://${path}`;
+
+    function isIOS() {
+      return /iPhone|iPad|iPod/i.test(navigator.userAgent);
+    }
+
+    function isAndroid() {
+      return /Android/i.test(navigator.userAgent);
+    }
+
+    if (isIOS()) {
+      window.location.href = deepLink;
+      setTimeout(() => {
+        window.location.href = appStoreLink;
+      }, 1500);
+    } else if (isAndroid()) {
+      window.location.href = deepLink;
+      setTimeout(() => {
+        window.location.href = playStoreLink;
+      }, 1500);
+    } else {
+      window.location.href = playStoreLink;
+    }
+
+    window.addEventListener("blur", () => {
+      clearTimeout(timeout);
+    });
+  </script>
+</body>
+</html>

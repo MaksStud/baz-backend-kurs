@@ -1,0 +1,82 @@
+# Byte-compiled / optimized / DLL files
+__pycache__/
+*.py[cod]
+*$py.class
+
+# Django specific
+*.log
+*.pot
+*.pyc
+*.pyo
+*.pyd
+*.db
+*.sqlite3
+
+# Static files
+/static/
+!/static/.gitkeep
+
+# Media files
+/media/
+!/media/.gitkeep
+
+# Backup files
+*.bak
+*.swp
+
+# Environment variables
+.env
+
+# VSCode settings
+.vscode/
+
+# PyCharm settings
+.idea/
+
+# macOS
+.DS_Store
+
+# Windows
+Thumbs.db
+ehthumbs.db
+*.stackdump
+
+# Jupyter Notebook
+.ipynb_checkpoints
+
+# celery beat schedule file
+celerybeat-schedule
+
+# coverage reports
+htmlcov/
+.tox/
+.nox/
+.coverage
+.coverage.*
+.cache
+nosetests.xml
+coverage.xml
+*.cover
+*.py,cover
+.hypothesis/
+
+# Pylint
+.pylint.d/
+
+# Pytest
+.pytest_cache/
+pytest-debug.log
+
+
+/docker/redis/redis_data
+
+# apps migrations
+user/migrations
+subscription/migrations
+common/migrations
+brand/migrations
+ability/migrations
+news/migrations
+premium/migrations
+notifications/migrations
+technical_support/migrations

@@ -1,0 +1,79 @@
+version: '3'
+services:
+  db:
+    image: postgres:12
+    environment:
+      - POSTGRES_DB={POSTGRES_DB}
+      - POSTGRES_USER={POSTGRES_USER}
+      - POSTGRES_PASSWORD={POSTGRES_PASSWORD}
+      - POSTGRES_HOST_AUTH_METHOD=trust
+    expose:
+      - 5432
+    ports:
+      - "5432:5432"
+    env_file:
+      - .env
+    volumes:
+      - postgres_data:/var/lib/postgresql/data/
+      - ./docker/postgresql/init.sql:/docker-entrypoint-initdb.d/init.sql
+    restart: always
+
+  web:
+    build: .
+    command:
+      bash -c "
+      sleep 1
+      && python manage.py makemigrations
+      && python manage.py migrate
+      && python manage.py collectstatic --noinput
+      && daphne -b 0.0.0.0 -p 8000 backend.asgi:application"
+    volumes:
+      - .:/app
+      - ./static:/var/static
+      - ./uploads:/var/uploads
+    ports:
+      - "8000:8000"
+      - "5678:5678"
+    depends_on:
+      - redis
+      - db
+    links:
+      - redis:redis
+    env_file:
+      - .env
+    restart: always
+
+  celery:
+    build: .
+    depends_on:
+      - db
+      - redis
+    env_file:
+       - .env
+    volumes:
+      - .:/app
+    command: >
+      bash -c "
+        sleep 3 &&
+        celery -A backend worker -E -B -l debug &&
+        celery -A backend beat --loglevel=info"
+    restart: always
+
+
+  redis:
+    image: redis
+    volumes:
+      - ./docker/redis/redis.conf:/usr/local/etc/redis/redis.conf
+      - ./docker/redis/redis_data:/data
+    expose:
+      - "6379"
+    ports:
+      - "6379:6379"
+    env_file:
+      - .env
+    command: redis-server /usr/local/etc/redis/redis.conf --requirepass "${REDIS_PASSWORD}"
+    restart: always
+
+
+volumes:
+  postgres_data:
